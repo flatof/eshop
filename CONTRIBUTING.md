@@ -1,6 +1,6 @@
-# Contributing to E-Commerce Skeleton
+# Contributing to Eshop Skeleton
 
-Thank you for your interest in contributing to the E-Commerce Skeleton project! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to the Eshop Skeleton project! This document provides guidelines and information for contributors.
 
 ## 🚀 Getting Started
 
@@ -13,7 +13,7 @@ Thank you for your interest in contributing to the E-Commerce Skeleton project! 
 
 ### Development Setup
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/JIIL07/E-Commerce`
+2. Clone your fork: `git clone https://github.com/JIIL07/Eshop`
 3. Setup environment: `make setup`
 4. Start development: `make dev`
 
@@ -133,4 +133,4 @@ make test
 - Additional examples
 
 
-Thank you for contributing to E-Commerce Skeleton! 🎉
+Thank you for contributing to Eshop Skeleton! 🎉

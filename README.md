@@ -1,15 +1,15 @@
-# 🚀 E-Commerce
+# 🚀 Eshop
 
 <div align="center">
 
-![E-Commerce Platform](https://img.shields.io/badge/E--Commerce-Platform-blue?style=for-the-badge&logo=shopping-cart)
+![Eshop Platform](https://img.shields.io/badge/Eshop-Platform-blue?style=for-the-badge&logo=shopping-cart)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
 ![Go](https://img.shields.io/badge/Go-1.23-blue?style=for-the-badge&logo=go)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker)
 ![Template](https://img.shields.io/badge/Template-For_Developers-green?style=for-the-badge&logo=code)
 
-**Complete E-Commerce - ready-to-customize template for developers**
+**Complete Eshop - ready-to-customize template for developers**
 
 [![Documentation](https://img.shields.io/badge/📚_Documentation-Read_More-blue?style=for-the-badge)](#-documentation)
 [![Get Started](https://img.shields.io/badge/⚡_Get_Started-5_Minutes-orange?style=for-the-badge)](#quick-start)
@@ -23,7 +23,7 @@
 ### 🎯 **Ready-to-Customize Template**
 - **Full-featured backend API** out of the box
 - **Clean architecture** with layered separation
-- **Pre-built data models** for E-Commerce
+- **Pre-built data models** for Eshop
 - **Smart image system** with automatic placeholders
 - **Admin panel** for easy management
 - **Well-documented code** for easy understanding
@@ -96,8 +96,8 @@ graph TB
 ### ⚡ Launch in 1 command
 
 ```bash
-git clone https://github.com/JIIL07/E-Commerce
-cd E-Commerce
+git clone https://github.com/JIIL07/Eshop
+cd Eshop
 
 make start-full
 ```
@@ -124,7 +124,7 @@ make auto-init
 ## 👨‍💻 For Developers
 
 ### 🎯 **What You Get**
-This skeleton provides you with a **complete E-Commerce platform** with backend and frontend that you can:
+This skeleton provides you with a **complete Eshop platform** with backend and frontend that you can:
 
 - **Customize to your needs** - change design, add new features
 - **Launch quickly** - ready-to-work online store out of the box
@@ -281,8 +281,8 @@ docker compose up -d
 
 <div align="center">
 
-**Created with ❤️ for E-Commerce developers**
+**Created with ❤️ for Eshop developers**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=flat&logo=github)](https://github.com/JIIL07/E-Commerce)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=flat&logo=github)](https://github.com/JIIL07/Eshop)
 
 </div>

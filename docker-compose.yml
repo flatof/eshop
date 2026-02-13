@@ -88,7 +88,7 @@ services:
     container_name: ecommerce-frontend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:5000
-      NEXT_PUBLIC_APP_NAME: E-Commerce
+      NEXT_PUBLIC_APP_NAME: Eshop
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NODE_ENV: production
     ports:
