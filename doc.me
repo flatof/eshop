@@ -1,0 +1,533 @@
+# Документация проекта Eshop
+
+## Содержание
+1. [Общее описание](#общее-описание)
+2. [Архитектура проекта](#архитектура-проекта)
+3. [Стек технологий](#стек-технологий)
+4. [Структура проекта](#структура-проекта)
+5. [Установка и запуск](#установка-и-запуск)
+6. [Конфигурация](#конфигурация)
+7. [Модели данных](#модели-данных)
+8. [API эндпоинты](#api-эндпоинты)
+9. [Фронтенд](#фронтенд)
+10. [Бэкенд](#бэкенд)
+11. [База данных](#база-данных)
+12. [Кэширование](#кэширование)
+13. [Аутентификация и авторизация](#аутентификация-и-авторизация)
+14. [WebSocket](#websocket)
+15. [Загрузка файлов](#загрузка-файлов)
+16. [Админ-панель](#админ-панель)
+17. [Мониторинг и метрики](#мониторинг-и-метрики)
+18. [Тестирование](#тестирование)
+19. [Развертывание](#развертывание)
+20. [Команды Make](#команды-make)
+
+## Общее описание
+
+Eshop - это современный шаблон интернет-магазина, разработанный для быстрого старта и настройки под конкретные нужды. Проект включает в себя полный стек технологий для создания полноценного e-commerce решения с возможностью масштабирования и персонализации.
+
+## Архитектура проекта
+
+Проект использует микросервисную архитектуру с разделением на фронтенд и бэкенд части:
+- Фронтенд: Next.js 14 с App Router
+- Бэкенд: Go с фреймворком Gin
+- База данных: PostgreSQL
+- Кэш: Redis
+- Прокси: Nginx
+- Мониторинг: Prometheus и Grafana
+
+## Стек технологий
+
+### Фронтенд:
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- React Hooks
+- NextAuth.js (для аутентификации)
+
+### Бэкенд:
+- Go (Golang)
+- Gin Framework
+- GORM (ORM для базы данных)
+- JWT (для аутентификации)
+- Gorilla WebSocket
+- Viper (для конфигурации)
+
+### База данных:
+- PostgreSQL
+- Migrate (для миграций)
+
+### Инфраструктура:
+- Docker
+- Docker Compose
+- Nginx (reverse proxy)
+- Prometheus (мониторинг)
+- Grafana (визуализация метрик)
+
+## Структура проекта
+
+```
+Eshop/
+├── .dockerignore
+├── .env.example
+├── .gitignore
+├── CONTRIBUTING.md
+├── Dockerfile (для фронтенда)
+├── Makefile
+├── PROJECT_GUIDE.md
+├── README.md
+├── backend-go/ (Go бэкенд)
+│   ├── Dockerfile
+│   ├── cmd/
+│   │   └── main.go
+│   ├── go.mod
+│   ├── go.sum
+│   ├── internal/
+│   │   ├── config/
+│   │   ├── database/
+│   │   ├── handlers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── repositories/
+│   │   ├── seeds/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── websocket/
+│   ├── migrations/
+│   ├── scripts/
+│   ├── static/
+│   └── templates/
+├── docker-compose.yml
+├── env.example
+├── frontend/ (Next.js фронтенд)
+│   ├── Dockerfile
+│   ├── next.config.js
+│   ├── package.json
+│   ├── public/
+│   └── src/
+│       ├── app/
+│       ├── components/
+│       ├── hooks/
+│       └── lib/
+├── logs/
+├── monitoring/
+├── nginx/
+└── uploads/
+```
+
+## Установка и запуск
+
+### Требования
+- Docker
+- Docker Compose
+- Make (опционально)
+
+### Установка
+1. Клонировать репозиторий:
+```bash
+git clone https://github.com/JIIL07/Eshop
+cd Eshop
+```
+
+2. Скопировать пример файла конфигурации:
+```bash
+cp env.example .env
+```
+
+3. Отредактировать .env файл с вашими параметрами
+
+4. Запустить проект:
+```bash
+make start-full
+```
+
+### Альтернативные способы запуска
+```bash
+# Запуск в режиме разработки
+make dev
+
+# Запуск с инициализацией базы данных
+make auto-init
+
+# Запуск в продакшен режиме
+make final
+```
+
+## Конфигурация
+
+Конфигурация приложения находится в файле `.env`. Основные параметры:
+
+- `DB_HOST` - хост базы данных
+- `DB_PORT` - порт базы данных
+- `DB_USER` - пользователь базы данных
+- `DB_PASSWORD` - пароль базы данных
+- `DB_NAME` - имя базы данных
+- `JWT_SECRET` - секретный ключ для JWT
+- `REDIS_HOST` - хост Redis
+- `REDIS_PORT` - порт Redis
+- `STRIPE_SECRET_KEY` - секретный ключ Stripe
+- `STRIPE_WEBHOOK_SECRET` - вебхук секретный ключ Stripe
+
+## Модели данных
+
+### Пользователь (User)
+```go
+type User struct {
+    ID        string    `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+    Email     string    `json:"email" gorm:"uniqueIndex;not null" validate:"required,email"`
+    Name      string    `json:"name" gorm:"not null" validate:"required,min=2,max=100"`
+    Password  string    `json:"password" gorm:"not null" validate:"required,min=6"`
+    Role      string    `json:"role" gorm:"default:user" validate:"oneof=user admin"`
+    Image     string    `json:"image,omitempty" gorm:"default:''"`
+    CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+    UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+```
+
+### Товар (Product)
+```go
+type Product struct {
+    ID           string    `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+    Name         string    `json:"name" gorm:"not null" validate:"required,min=1,max=200"`
+    Slug         string    `json:"slug" gorm:"uniqueIndex;not null" validate:"required,min=1,max=255"`
+    Description  string    `json:"description" gorm:"type:text" validate:"max=1000"`
+    Price        float64   `json:"price" gorm:"not null" validate:"required,gt=0"`
+    ComparePrice float64   `json:"compare_price,omitempty" gorm:"default:0"`
+    Images       []string  `json:"images" gorm:"type:text[]"`
+    InStock      bool      `json:"in_stock" gorm:"default:true"`
+    Stock        int       `json:"stock" gorm:"default:0" validate:"gte=0"`
+    Featured     bool      `json:"featured" gorm:"default:false"`
+    CategoryID   string    `json:"category_id" gorm:"index"`
+    Category     Category  `json:"category" gorm:"foreignKey:CategoryID"`
+    CreatedAt    time.Time `json:"created_at" gorm:"autoCreateTime"`
+    UpdatedAt    time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+```
+
+### Категория (Category)
+```go
+type Category struct {
+    ID          string    `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+    Name        string    `json:"name" gorm:"not null" validate:"required,min=1,max=100"`
+    Slug        string    `json:"slug" gorm:"uniqueIndex;not null" validate:"required,min=1,max=255"`
+    Description string    `json:"description" gorm:"type:text" validate:"max=500"`
+    Image       string    `json:"image,omitempty"`
+    ParentID    *string   `json:"parent_id,omitempty" gorm:"index"`
+    CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+    UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+```
+
+### Заказ (Order)
+```go
+type Order struct {
+    ID             string    `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+    UserID         string    `json:"user_id" gorm:"not null;index"`
+    User           User      `json:"user" gorm:"foreignKey:UserID"`
+    Status         string    `json:"status" gorm:"default:pending" validate:"oneof=pending processing shipped delivered cancelled"`
+    Total          float64   `json:"total" gorm:"not null" validate:"required,gt=0"`
+    Subtotal       float64   `json:"subtotal" gorm:"not null" validate:"required,gt=0"`
+    Tax            float64   `json:"tax" gorm:"default:0" validate:"gte=0"`
+    Shipping       float64   `json:"shipping" gorm:"default:0" validate:"gte=0"`
+    ShippingAddress Address   `json:"shipping_address" gorm:"type:jsonb"`
+    BillingAddress  Address   `json:"billing_address" gorm:"type:jsonb"`
+    PaymentIntent  string    `json:"payment_intent,omitempty"`
+    CreatedAt      time.Time `json:"created_at" gorm:"autoCreateTime"`
+    UpdatedAt      time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+```
+
+## API эндпоинты
+
+### Аутентификация
+- `POST /api/auth/register` - регистрация пользователя
+- `POST /api/auth/login` - вход пользователя
+- `GET /api/auth/profile` - получение профиля пользователя
+- `PUT /api/auth/profile` - обновление профиля пользователя
+
+### Товары
+- `GET /api/products` - получить все товары
+- `GET /api/products/featured` - получить рекомендуемые товары
+- `GET /api/products/search` - поиск товаров
+- `GET /api/products/:id` - получить конкретный товар
+- `POST /api/products` - создать товар (требует аутентификации)
+- `PUT /api/products/:id` - обновить товар (требует аутентификации)
+- `DELETE /api/products/:id` - удалить товар (требует аутентификации)
+
+### Категории
+- `GET /api/categories` - получить все категории
+- `GET /api/categories/:slug` - получить конкретную категорию
+- `POST /api/categories` - создать категорию (требует аутентификации)
+- `PUT /api/categories/:slug` - обновить категорию (требует аутентификации)
+- `DELETE /api/categories/:slug` - удалить категорию (требует аутентификации)
+
+### Корзина
+- `GET /api/cart` - получить содержимое корзины
+- `POST /api/cart` - добавить товар в корзину
+- `PUT /api/cart/:id` - обновить количество товара в корзине
+- `DELETE /api/cart/:id` - удалить товар из корзины
+- `DELETE /api/cart` - очистить корзину
+
+### Заказы
+- `GET /api/orders` - получить все заказы пользователя
+- `GET /api/orders/:id` - получить конкретный заказ
+- `POST /api/orders` - создать заказ
+- `PUT /api/orders/:id/status` - обновить статус заказа (только для администраторов)
+- `DELETE /api/orders/:id` - отменить заказ
+
+### Отзывы
+- `GET /api/reviews/product/:productId` - получить отзывы для продукта
+- `GET /api/reviews/user` - получить отзывы пользователя
+- `GET /api/reviews/user/:productId` - получить отзыв пользователя для продукта
+- `POST /api/reviews` - создать отзыв
+- `PUT /api/reviews/:id` - обновить отзыв
+- `DELETE /api/reviews/:id` - удалить отзыв
+
+### Платежи
+- `POST /api/payments/intent` - создать платежный намерение
+- `POST /api/payments/confirm` - подтвердить платеж
+- `GET /api/payments/history` - получить историю платежей
+
+### Список желаний
+- `GET /api/wishlist` - получить список желаний
+- `POST /api/wishlist` - добавить товар в список желаний
+- `DELETE /api/wishlist/:productId` - удалить товар из списка желаний
+- `GET /api/wishlist/:productId/check` - проверить наличие товара в списке желаний
+- `DELETE /api/wishlist` - очистить список желаний
+
+### Загрузка файлов
+- `POST /api/uploads` - загрузить изображение
+- `GET /api/uploads/:filename` - получить изображение
+- `DELETE /api/uploads/:filename` - удалить изображение
+
+### WebSocket
+- `GET /ws` - подключение к WebSocket
+- `GET /ws/users` - получить подключенных пользователей
+- `GET /ws/count` - получить количество подключенных клиентов
+- `POST /ws/notification` - отправить уведомление
+- `POST /ws/order-update` - отправить обновление заказа
+- `POST /ws/product-update` - отправить обновление продукта
+- `POST /ws/stock-alert` - отправить уведомление о наличии
+- `POST /ws/price-alert` - отправить уведомление о цене
+- `POST /ws/new-product` - отправить уведомление о новом продукте
+- `POST /ws/promotion` - отправить уведомление о рекламной акции
+- `POST /ws/maintenance` - отправить уведомление о техническом обслуживании
+- `POST /ws/user-activity` - отправить уведомление о активности пользователя
+- `POST /ws/analytics` - отправить обновление аналитики
+- `POST /ws/stats` - отправить обновление статистики
+
+## Фронтенд
+
+### Структура фронтенда
+- `src/app/` - страницы Next.js (App Router)
+- `src/components/` - переиспользуемые компоненты
+- `src/hooks/` - кастомные React хуки
+- `src/lib/` - библиотечные утилиты
+- `public/` - публичные ресурсы
+
+### Страницы
+- `/` - главная страница
+- `/products` - страница товаров
+- `/products/[id]` - страница конкретного товара
+- `/cart` - страница корзины
+- `/checkout` - страница оформления заказа
+- `/orders` - страница заказов пользователя
+- `/profile` - страница профиля пользователя
+- `/wishlist` - страница списка желаний
+
+### Компоненты
+- `Header` - шапка сайта
+- `Footer` - футер сайта
+- `ProductCard` - карточка товара
+- `ProductGallery` - галерея товара
+- `ProductReviews` - отзывы о товаре
+- `CartItem` - элемент корзины
+- `Button` - кнопка
+- `Input` - поле ввода
+- `Modal` - модальное окно
+- `SearchBar` - строка поиска
+
+### Хуки
+- `useAuth` - хук для аутентификации
+- `useCart` - хук для работы с корзиной
+
+### Утилиты
+- `api.ts` - утилиты для работы с API
+- `auth.ts` - утилиты для аутентификации
+
+## Бэкенд
+
+### Структура бэкенда
+- `cmd/main.go` - точка входа в приложение
+- `internal/config/` - конфигурация приложения
+- `internal/database/` - работа с базой данных
+- `internal/handlers/` - HTTP обработчики
+- `internal/middleware/` - промежуточное ПО
+- `internal/models/` - модели данных
+- `internal/repositories/` - репозитории
+- `internal/seeds/` - начальные данные
+- `internal/services/` - бизнес-логика
+- `internal/utils/` - вспомогательные функции
+- `internal/websocket/` - WebSocket реализация
+- `migrations/` - SQL миграции
+- `scripts/` - скрипты
+- `static/` - статические файлы
+- `templates/` - HTML шаблоны
+
+### Обработчики (Handlers)
+Обработчики отвечают за обработку HTTP запросов и возвращение ответов. Каждый обработчик связан с определенным ресурсом (пользователь, товар, заказ и т.д.).
+
+### Сервисы (Services)
+Сервисы содержат бизнес-логику приложения. Они взаимодействуют с репозиториями для выполнения операций над данными.
+
+### Репозитории (Repositories)
+Репозитории отвечают за взаимодействие с базой данных. Они обеспечивают абстракцию над ORM и позволяют легко тестировать бизнес-логику.
+
+### Промежуточное ПО (Middleware)
+- `AuthMiddleware` - проверяет JWT токен
+- `CORSMiddleware` - настраивает CORS
+- `LoggingMiddleware` - логирует запросы
+- `SecurityHeadersMiddleware` - добавляет безопасные заголовки
+- `RequestIDMiddleware` - добавляет уникальный ID запроса
+- `MetricsMiddleware` - собирает метрики
+- `RateLimitMiddleware` - ограничивает частоту запросов
+
+## База данных
+
+### Система управления базами данных
+PostgreSQL используется как основная система управления базами данных. Она выбрана за счет своей надежности, производительности и расширенных возможностей.
+
+### Миграции
+Миграции находятся в папке `migrations/`. Они используются для изменения структуры базы данных в контролируемом порядке. Каждая миграция имеет две версии:
+- `.up.sql` - применение изменений
+- `.down.sql` - откат изменений
+
+### Сиды
+Сиды находятся в `internal/seeds/` и используются для заполнения базы данных начальными данными для разработки и тестирования.
+
+## Кэширование
+
+Redis используется для кэширования данных и обеспечения высокой производительности. Кэширование применяется для:
+- Сессий пользователей
+- Часто запрашиваемых данных (категории, популярные товары)
+- Результатов поиска
+- Временных данных аутентификации
+
+## Аутентификация и авторизация
+
+### JWT токены
+Проект использует JWT (JSON Web Tokens) для аутентификации пользователей. Токены состоят из трех частей:
+- Заголовок (header)
+- Полезная нагрузка (payload)
+- Подпись (signature)
+
+### Роли пользователей
+- `user` - обычный пользователь
+- `admin` - администратор с расширенными правами
+
+### Защита эндпоинтов
+Некоторые эндпоинты требуют аутентификации или специальных прав доступа. Это реализовано через middleware.
+
+## WebSocket
+
+WebSocket используется для реального времени взаимодействия между клиентом и сервером. Возможности:
+- Уведомления о статусе заказов
+- Уведомления об изменении наличия товаров
+- Уведомления об изменении цен
+- Уведомления о новых продуктах
+- Рекламные уведомления
+- Уведомления о техническом обслуживании
+- Уведомления об активности пользователей
+
+## Загрузка файлов
+
+Система загрузки файлов позволяет пользователям загружать изображения. Особенности:
+- Максимальный размер файла: 5MB
+- Поддерживаемые форматы: JPG, PNG, GIF, WebP
+- Автоматическая генерация placeholder изображений
+- Безопасная проверка типа файла
+- Сохранение в папке `uploads/`
+
+## Админ-панель
+
+Админ-панель доступна по адресу `/admin` и предоставляет интерфейс для управления:
+- Пользователями
+- Товарами
+- Заказами
+- Категориями
+- Отзывами
+- Статистикой системы
+- Логами
+- Метриками
+- Кэшем
+
+## Мониторинг и метрики
+
+### Prometheus
+Система сбора метрик, которая отслеживает:
+- Количество HTTP запросов
+- Время ответа
+- Количество ошибок
+- Активные соединения
+- Состояние базы данных
+
+### Grafana
+Система визуализации метрик, которая предоставляет дашборды для мониторинга:
+- Производительности API
+- Состояния базы данных
+- Активности пользователей
+- Системных ресурсов
+
+## Тестирование
+
+### Unit тесты
+Unit тесты покрывают отдельные функции и методы. Они находятся в тех же пакетах, что и тестируемый код, но с суффиксом `_test.go`.
+
+### Интеграционные тесты
+Интеграционные тесты проверяют взаимодействие между различными компонентами системы.
+
+### Тестирование API
+API тесты проверяют работу эндпоинтов и их ответы.
+
+## Развертывание
+
+### Docker
+Проект полностью контейнеризирован с использованием Docker и Docker Compose. Это позволяет легко развертывать приложение в любой среде.
+
+### CI/CD
+Для автоматизации процесса развертывания можно использовать системы непрерывной интеграции и доставки (CI/CD).
+
+### Масштабирование
+- Множественные экземпляры бэкенда
+- Балансировка нагрузки
+- Кластеризация базы данных
+- CDN для статических ресурсов
+- Кэширование на уровне приложения и базы данных
+
+## Команды Make
+
+### Основные команды
+- `make dev` - запуск в режиме разработки
+- `make final` - запуск в оптимизированном режиме
+- `make dev-down` - остановка разработки
+- `make build` - сборка Docker образов (без кэша)
+- `make build-fast` - сборка Docker образов (с кэшем)
+- `make setup` - настройка проекта
+- `make init` - инициализация базы данных
+- `make migrate` - выполнение миграций
+- `make seed` - заполнение базы данных тестовыми данными
+- `make generate-images` - генерация placeholder изображений
+- `make auto-init` - полная инициализация проекта
+- `make start-full` - полный запуск с инициализацией
+- `make test` - запуск тестов
+- `make clean` - очистка контейнеров и томов
+
+### Команды сидинга
+- `make seed-categories` - заполнение только категорий
+- `make seed-products` - заполнение только продуктов
+- `make seed-users` - заполнение только пользователей
+- `make seed-orders` - заполнение только заказов
+- `make seed-reviews` - заполнение только отзывов
+
+### Справочные команды
+- `make help` - отображение доступных команд

@@ -183,7 +183,7 @@ func runAdmin(cfg *config.AppConfig) {
 }
 
 func runServer(cfg *config.AppConfig) {
-	fmt.Println("🚀 Starting E-Commerce server...")
+	fmt.Println("🚀 Starting Eshop server...")
 
 	utils.InitJWT(cfg.JWT.Secret, cfg.JWT.ExpiresIn, cfg.JWT.RefreshIn, cfg.JWT.Issuer, cfg.JWT.Audience)
 	if err := database.InitDatabase(); err != nil {
@@ -273,7 +273,7 @@ http_request_duration_seconds %s
 	})
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "E-Commerce API Server",
+			"message": "Eshop API Server",
 			"version": "2.0.0",
 			"status":  "running",
 			"endpoints": gin.H{
@@ -294,7 +294,7 @@ http_request_duration_seconds %s
 
 	r.GET("/docs", func(c *gin.Context) {
 		c.HTML(200, "docs.html", gin.H{
-			"title": "E-Commerce API Documentation",
+			"title": "Eshop API Documentation",
 		})
 	})
 
@@ -1039,7 +1039,7 @@ func waitForDatabase(cfg *config.AppConfig, timeout time.Duration) error {
 }
 
 func runAutoInit(cfg *config.AppConfig, waitForDB bool, timeout time.Duration) {
-	fmt.Println("🚀 Auto-initializing E-Commerce Project...")
+	fmt.Println("🚀 Auto-initializing Eshop Project...")
 	fmt.Println("==========================================")
 
 	fmt.Println("\n🔧 Step 1: Initializing database...")
@@ -1166,7 +1166,7 @@ func generatePlaceholderImage(filePath, productName string) error {
 		Face: basicfont.Face7x13,
 		Dot:  logoPoint,
 	}
-	d.DrawString("E-Commerce")
+	d.DrawString("Eshop")
 
 	productColor := color.RGBA{255, 255, 255, 200}
 	productPoint := fixed.Point26_6{
@@ -1211,7 +1211,7 @@ func generatePlaceholderImage(filePath, productName string) error {
 }
 
 func showHelp() {
-	fmt.Println("E-Commerce Unified Command Tool")
+	fmt.Println("Eshop Unified Command Tool")
 	fmt.Println("===============================")
 	fmt.Println()
 	fmt.Println("Usage:")

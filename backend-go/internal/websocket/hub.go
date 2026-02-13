@@ -45,7 +45,7 @@ func (h *Hub) Run() {
 
 			welcomeMsg := CreateMessage(MessageTypeNotification, NotificationData{
 				Title:   "Welcome",
-				Message: "Connected to E-Commerce WebSocket",
+				Message: "Connected to Eshop WebSocket",
 				Icon:    "success",
 			}, client.UserID)
 			h.sendToClient(client, welcomeMsg)

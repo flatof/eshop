@@ -6,7 +6,7 @@ import Layout from '@/components/layout/Layout'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'E-Commerce Platform',
+  title: 'Eshop Platform',
   description: 'Modern e-commerce platform built with Next.js, Go, and PostgreSQL',
 }
 

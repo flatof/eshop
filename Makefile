@@ -58,7 +58,7 @@ build-fast:
 	docker-compose build --parallel
 
 setup:
-	@echo "Setting up E-Commerce project..."
+	@echo "Setting up Eshop project..."
 ifeq ($(OS),Windows_NT)
 	@if not exist .env ( \
 		echo Creating .env file from template... && \
@@ -102,20 +102,20 @@ generate-images:
 	@echo "Images are available at: http://localhost:5000/api/uploads/"
 
 auto-init:
-	@echo "Auto-initializing E-Commerce project..."
+	@echo "Auto-initializing Eshop project..."
 	@echo "This will: initialize DB, seed data, and generate placeholder images"
 	cd backend-go && go run cmd/main.go -mode=auto-init -wait
 	@echo "Project ready! Visit http://localhost:3000"
 
 start-full:
-	@echo "Starting E-Commerce with full initialization..."
+	@echo "Starting Eshop with full initialization..."
 	@echo "Building and starting services..."
 	docker-compose up -d --build
 	@echo "Waiting for services to be ready..."
 	timeout /t 10 /nobreak >nul 2>&1 || sleep 10
 	@echo "Running auto-initialization..."
 	cd backend-go && go run cmd/main.go -mode=auto-init -wait
-	@echo "E-Commerce is ready!"
+	@echo "Eshop is ready!"
 	@echo "Frontend: http://localhost:3000"
 	@echo "Backend: http://localhost:5000"
 	@echo "Admin: http://localhost:5000/admin"
